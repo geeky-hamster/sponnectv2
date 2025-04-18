@@ -1,0 +1,1758 @@
+{
+	"info": {
+		"_postman_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+		"name": "Influencer Platform V2 API",
+		"description": "API for the Influencer Engagement & Sponsorship Coordination Platform V2",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "0"
+	},
+	"item": [
+		{
+			"name": "Authentication",
+			"item": [
+				{
+					"name": "Register User",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\": \"new_sponsor_co\",\n    \"password\": \"securepassword123\",\n    \"role\": \"sponsor\", \n    \"company_name\": \"Sponsor Company LLC\",\n    \"industry\": \"Tech\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/register",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"register"
+							]
+						},
+						"description": "Register a new Sponsor or Influencer. Sponsors require admin approval."
+					},
+					"response": []
+				},
+				{
+					"name": "Login User",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\": \"sponsor_user\",\n    \"password\": \"password123\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/login",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"login"
+							]
+						},
+						"description": "Login to get JWT token. Replace username/password."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Profile",
+			"item": [
+				{
+					"name": "Get My Profile",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/profile",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"profile"
+							]
+						},
+						"description": "Get the profile details of the currently logged-in user."
+					},
+					"response": []
+				},
+				{
+					"name": "Update My Profile",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"influencer_name\": \"Updated Influencer Name\",\n    \"category\": \"Lifestyle\",\n    \"niche\": \"Travel, Food\",\n    \"reach\": 150000\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/profile",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"profile"
+							]
+						},
+						"description": "Update the profile details of the currently logged-in user. Fields depend on the user's role (Example: Influencer)."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Public Influencer Profile",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/influencers/:influencer_id/profile",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"influencers",
+								":influencer_id",
+								"profile"
+							],
+							"variable": [
+								{
+									"key": "influencer_id",
+									"value": "1",
+									"description": "ID of the influencer"
+								}
+							]
+						},
+						"description": "View the public profile of a specific active influencer."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Admin",
+			"item": [
+				{
+					"name": "Get Admin Stats",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/admin/stats",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"admin",
+								"stats"
+							]
+						},
+						"description": "Admin access required. Get overall platform statistics."
+					},
+					"response": []
+				},
+				{
+					"name": "Admin List Users (NEW)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/admin/users?page=1&per_page=10&role=sponsor&status=pending_approval&search=Company",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"admin",
+								"users"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1",
+									"description": "Page number for pagination",
+									"disabled": true
+								},
+								{
+									"key": "per_page",
+									"value": "10",
+									"description": "Items per page",
+									"disabled": true
+								},
+								{
+									"key": "role",
+									"value": "sponsor",
+									"description": "Filter by role ('sponsor', 'influencer')",
+									"disabled": true
+								},
+								{
+									"key": "status",
+									"value": "pending_approval",
+									"description": "Filter by status ('active', 'inactive', 'pending_approval', 'approved')",
+									"disabled": true
+								},
+								{
+									"key": "search",
+									"value": "Company",
+									"description": "Search term for username or name",
+									"disabled": true
+								},
+								{
+									"key": "flagged",
+									"value": "true",
+									"description": "Filter by flagged status ('true' or 'false')",
+									"disabled": true
+								}
+							]
+						},
+						"description": "Admin access required. List all users (sponsors/influencers) with optional filters (role, status, flagged, search) and pagination."
+					},
+					"response": []
+				},
+				{
+					"name": "Admin Get Pending Sponsors",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/admin/pending_sponsors",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"admin",
+								"pending_sponsors"
+							]
+						},
+						"description": "Admin access required. Get a list of sponsors awaiting approval."
+					},
+					"response": []
+				},
+				{
+					"name": "Admin Approve Sponsor",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/admin/sponsors/:sponsor_id/approve",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"admin",
+								"sponsors",
+								":sponsor_id",
+								"approve"
+							],
+							"variable": [
+								{
+									"key": "sponsor_id",
+									"value": "1",
+									"description": "ID of the sponsor to approve"
+								}
+							]
+						},
+						"description": "Admin access required. Approve a pending sponsor registration."
+					},
+					"response": []
+				},
+				{
+					"name": "Admin Reject Sponsor",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/admin/sponsors/:sponsor_id/reject",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"admin",
+								"sponsors",
+								":sponsor_id",
+								"reject"
+							],
+							"variable": [
+								{
+									"key": "sponsor_id",
+									"value": "1",
+									"description": "ID of the sponsor to reject"
+								}
+							]
+						},
+						"description": "Admin access required. Reject a pending sponsor registration and deactivate the account."
+					},
+					"response": []
+				},
+				{
+					"name": "Admin Deactivate User (NEW)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/admin/users/:user_id/deactivate",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"admin",
+								"users",
+								":user_id",
+								"deactivate"
+							],
+							"variable": [
+								{
+									"key": "user_id",
+									"value": "1",
+									"description": "ID of the user (sponsor/influencer) to deactivate"
+								}
+							]
+						},
+						"description": "Admin access required. Mark a user account as inactive."
+					},
+					"response": []
+				},
+				{
+					"name": "Admin Activate User (NEW)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/admin/users/:user_id/activate",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"admin",
+								"users",
+								":user_id",
+								"activate"
+							],
+							"variable": [
+								{
+									"key": "user_id",
+									"value": "1",
+									"description": "ID of the user (sponsor/influencer) to activate. Sponsor must be approved."
+								}
+							]
+						},
+						"description": "Admin access required. Mark a user account as active. Sponsors must be approved first."
+					},
+					"response": []
+				},
+				{
+					"name": "Admin Flag User",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/admin/users/:user_id/flag",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"admin",
+								"users",
+								":user_id",
+								"flag"
+							],
+							"variable": [
+								{
+									"key": "user_id",
+									"value": "1",
+									"description": "ID of the user to flag"
+								}
+							]
+						},
+						"description": "Admin access required. Flag a user."
+					},
+					"response": []
+				},
+				{
+					"name": "Admin Unflag User",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/admin/users/:user_id/unflag",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"admin",
+								"users",
+								":user_id",
+								"unflag"
+							],
+							"variable": [
+								{
+									"key": "user_id",
+									"value": "1",
+									"description": "ID of the user to unflag"
+								}
+							]
+						},
+						"description": "Admin access required. Unflag a user."
+					},
+					"response": []
+				},
+				{
+					"name": "Admin Flag Campaign",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/admin/campaigns/:campaign_id/flag",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"admin",
+								"campaigns",
+								":campaign_id",
+								"flag"
+							],
+							"variable": [
+								{
+									"key": "campaign_id",
+									"value": "1",
+									"description": "ID of the campaign to flag"
+								}
+							]
+						},
+						"description": "Admin access required. Flag a campaign."
+					},
+					"response": []
+				},
+				{
+					"name": "Admin Unflag Campaign",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/admin/campaigns/:campaign_id/unflag",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"admin",
+								"campaigns",
+								":campaign_id",
+								"unflag"
+							],
+							"variable": [
+								{
+									"key": "campaign_id",
+									"value": "1",
+									"description": "ID of the campaign to unflag"
+								}
+							]
+						},
+						"description": "Admin access required. Unflag a campaign."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Sponsor - Campaigns",
+			"item": [
+				{
+					"name": "Sponsor Create Campaign",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Summer Product Launch\",\n    \"description\": \"Campaign for new summer collection\",\n    \"start_date\": \"2024-06-01T00:00:00Z\",\n    \"end_date\": \"2024-08-31T23:59:59Z\",\n    \"budget\": 5000.00,\n    \"visibility\": \"public\",\n    \"goals\": \"Increase brand awareness, drive sales\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/sponsor/campaigns",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"sponsor",
+								"campaigns"
+							]
+						},
+						"description": "Sponsor access required. Create a new advertising campaign."
+					},
+					"response": []
+				},
+				{
+					"name": "Sponsor Get My Campaigns",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/sponsor/campaigns",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"sponsor",
+								"campaigns"
+							]
+						},
+						"description": "Sponsor access required. Get a list of all campaigns created by the sponsor."
+					},
+					"response": []
+				},
+				{
+					"name": "Sponsor Get Campaign Details",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/sponsor/campaigns/:campaign_id",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"sponsor",
+								"campaigns",
+								":campaign_id"
+							],
+							"variable": [
+								{
+									"key": "campaign_id",
+									"value": "1",
+									"description": "ID of the campaign"
+								}
+							]
+						},
+						"description": "Sponsor access required. Get details of a specific campaign owned by the sponsor."
+					},
+					"response": []
+				},
+				{
+					"name": "Sponsor Update Campaign",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Updated Summer Launch\",\n    \"budget\": 6500.00,\n    \"visibility\": \"private\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/sponsor/campaigns/:campaign_id",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"sponsor",
+								"campaigns",
+								":campaign_id"
+							],
+							"variable": [
+								{
+									"key": "campaign_id",
+									"value": "1",
+									"description": "ID of the campaign to update"
+								}
+							]
+						},
+						"description": "Sponsor access required. Update details of an existing campaign owned by the sponsor."
+					},
+					"response": []
+				},
+				{
+					"name": "Sponsor Delete Campaign",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/sponsor/campaigns/:campaign_id",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"sponsor",
+								"campaigns",
+								":campaign_id"
+							],
+							"variable": [
+								{
+									"key": "campaign_id",
+									"value": "1",
+									"description": "ID of the campaign to delete"
+								}
+							]
+						},
+						"description": "Sponsor access required. Delete a campaign owned by the sponsor."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Sponsor - Ad Requests",
+			"item": [
+				{
+					"name": "Sponsor Create Ad Request",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"influencer_id\": 2,\n    \"requirements\": \"3 Instagram posts, 1 story mentioning the product.\",\n    \"payment_amount\": 500.00,\n    \"message\": \"Collaboration proposal for Summer Launch campaign.\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/sponsor/campaigns/:campaign_id/ad_requests",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"sponsor",
+								"campaigns",
+								":campaign_id",
+								"ad_requests"
+							],
+							"variable": [
+								{
+									"key": "campaign_id",
+									"value": "1",
+									"description": "ID of the campaign to create request for"
+								}
+							]
+						},
+						"description": "Sponsor access required. Create an ad request (proposal) for a specific influencer on a campaign."
+					},
+					"response": []
+				},
+				{
+					"name": "Sponsor Get My Ad Requests",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/sponsor/ad_requests?status=Pending&campaign_id=1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"sponsor",
+								"ad_requests"
+							],
+							"query": [
+								{
+									"key": "status",
+									"value": "Pending",
+									"description": "Filter by status (Pending, Accepted, Rejected, Negotiating)",
+									"disabled": true
+								},
+								{
+									"key": "campaign_id",
+									"value": "1",
+									"description": "Filter by specific campaign ID",
+									"disabled": true
+								}
+							]
+						},
+						"description": "Sponsor access required. Get all ad requests associated with the sponsor's campaigns, with optional filters."
+					},
+					"response": []
+				},
+				{
+					"name": "Sponsor Negotiate Ad Request",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"action\": \"negotiate\",\n    \"payment_amount\": 550.00,\n    \"message\": \"Ok, we can slightly increase the offer.\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/sponsor/ad_requests/:ad_request_id",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"sponsor",
+								"ad_requests",
+								":ad_request_id"
+							],
+							"variable": [
+								{
+									"key": "ad_request_id",
+									"value": "1",
+									"description": "ID of the ad request to respond to"
+								}
+							]
+						},
+						"description": "Sponsor access required. Respond to an influencer's negotiation counter-offer (accept, reject, or make another counter-offer 'negotiate'). Only possible if status is 'Negotiating' and last offer was by influencer."
+					},
+					"response": []
+				},
+				{
+					"name": "Sponsor Delete Ad Request",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/sponsor/ad_requests/:ad_request_id",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"sponsor",
+								"ad_requests",
+								":ad_request_id"
+							],
+							"variable": [
+								{
+									"key": "ad_request_id",
+									"value": "1",
+									"description": "ID of the ad request to delete"
+								}
+							]
+						},
+						"description": "Sponsor access required. Delete an ad request (only if Pending or Rejected)."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Sponsor - Applications (NEW)",
+			"item": [
+				{
+					"name": "Sponsor Get Campaign Applications",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/sponsor/campaigns/:campaign_id/applications?status=Pending&page=1&per_page=10",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"sponsor",
+								"campaigns",
+								":campaign_id",
+								"applications"
+							],
+							"query": [
+								{
+									"key": "status",
+									"value": "Pending",
+									"description": "Filter by status (usually 'Pending')",
+									"disabled": true
+								},
+								{
+									"key": "page",
+									"value": "1",
+									"description": "Page number",
+									"disabled": true
+								},
+								{
+									"key": "per_page",
+									"value": "10",
+									"description": "Items per page",
+									"disabled": true
+								}
+							],
+							"variable": [
+								{
+									"key": "campaign_id",
+									"value": "1",
+									"description": "ID of the sponsor's campaign"
+								}
+							]
+						},
+						"description": "Sponsor access required. Get AdRequests initiated *by influencers* applying to a specific public campaign owned by the sponsor."
+					},
+					"response": []
+				},
+				{
+					"name": "Sponsor Accept Influencer Application",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/sponsor/applications/:ad_request_id/accept",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"sponsor",
+								"applications",
+								":ad_request_id",
+								"accept"
+							],
+							"variable": [
+								{
+									"key": "ad_request_id",
+									"value": "1",
+									"description": "ID of the AdRequest (application) to accept"
+								}
+							]
+						},
+						"description": "Sponsor access required. Accept a pending AdRequest that was initiated by an influencer."
+					},
+					"response": []
+				},
+				{
+					"name": "Sponsor Reject Influencer Application",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/sponsor/applications/:ad_request_id/reject",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"sponsor",
+								"applications",
+								":ad_request_id",
+								"reject"
+							],
+							"variable": [
+								{
+									"key": "ad_request_id",
+									"value": "1",
+									"description": "ID of the AdRequest (application) to reject"
+								}
+							]
+						},
+						"description": "Sponsor access required. Reject a pending AdRequest that was initiated by an influencer."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Influencer - Ad Requests",
+			"item": [
+				{
+					"name": "Influencer Get My Ad Requests",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/influencer/ad_requests?status=Pending",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"influencer",
+								"ad_requests"
+							],
+							"query": [
+								{
+									"key": "status",
+									"value": "Pending",
+									"description": "Filter by status",
+									"disabled": true
+								}
+							]
+						},
+						"description": "Influencer access required. Get all ad requests directed to the influencer."
+					},
+					"response": []
+				},
+				{
+					"name": "Influencer Action Ad Request",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"action\": \"negotiate\",\n    \"payment_amount\": 600.00,\n    \"message\": \"Thanks for the offer. My rate for this scope is $600.\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/influencer/ad_requests/:ad_request_id",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"influencer",
+								"ad_requests",
+								":ad_request_id"
+							],
+							"variable": [
+								{
+									"key": "ad_request_id",
+									"value": "1",
+									"description": "ID of the ad request to action"
+								}
+							]
+						},
+						"description": "Influencer access required. Action an ad request ('accept', 'reject', or 'negotiate'). Can only action 'Pending' requests or 'Negotiating' requests where the last offer was by the sponsor."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Influencer - Applications",
+			"item": [
+				{
+					"name": "Influencer Apply to Campaign",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"payment_amount\": 750.00,\n    \"message\": \"I believe my audience aligns well with this campaign! Proposing $750 for the described scope.\",\n    \"requirements\": \"Proposal based on campaign description: 2 posts, 2 stories.\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/influencer/campaigns/:campaign_id/apply",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"influencer",
+								"campaigns",
+								":campaign_id",
+								"apply"
+							],
+							"variable": [
+								{
+									"key": "campaign_id",
+									"value": "1",
+									"description": "ID of the public campaign to apply for"
+								}
+							]
+						},
+						"description": "Influencer access required. Apply to a public campaign by creating an AdRequest initiated by the influencer."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Search",
+			"item": [
+				{
+					"name": "Search Influencers",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/search/influencers?niche=Tech&reach_min=10000",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"search",
+								"influencers"
+							],
+							"query": [
+								{
+									"key": "niche",
+									"value": "Tech",
+									"disabled": true
+								},
+								{
+									"key": "category",
+									"value": "Technology",
+									"disabled": true
+								},
+								{
+									"key": "reach_min",
+									"value": "10000",
+									"disabled": true
+								}
+							]
+						},
+						"description": "Search for active, non-flagged influencers based on criteria (niche, category, reach). Accessible by any logged-in user."
+					},
+					"response": []
+				},
+				{
+					"name": "Search Campaigns",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/search/campaigns?budget_min=1000",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"search",
+								"campaigns"
+							],
+							"query": [
+								{
+									"key": "budget_min",
+									"value": "1000",
+									"disabled": true
+								}
+							]
+						},
+						"description": "Search for public, non-flagged campaigns based on criteria (min budget). Accessible by any logged-in user."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Charts (Admin)",
+			"item": [
+				{
+					"name": "Chart User Growth",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/charts/user-growth?months=6",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"charts",
+								"user-growth"
+							],
+							"query": [
+								{
+									"key": "months",
+									"value": "6",
+									"description": "Number of past months to include"
+								}
+							]
+						},
+						"description": "Admin access required. Get time-series data for user registrations."
+					},
+					"response": []
+				},
+				{
+					"name": "Chart Campaign Distribution",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/charts/campaign-distribution",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"charts",
+								"campaign-distribution"
+							]
+						},
+						"description": "Admin access required. Get campaign counts grouped by budget range."
+					},
+					"response": []
+				},
+				{
+					"name": "Chart Ad Request Status",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/charts/ad-request-status",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"charts",
+								"ad-request-status"
+							]
+						},
+						"description": "Admin access required. Get counts of ad requests grouped by status."
+					},
+					"response": []
+				},
+				{
+					"name": "Chart Campaign Activity",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/charts/campaign-activity?months=6",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"charts",
+								"campaign-activity"
+							],
+							"query": [
+								{
+									"key": "months",
+									"value": "6",
+									"description": "Number of past months"
+								}
+							]
+						},
+						"description": "Admin access required. Get time-series data for campaign creation and ad requests."
+					},
+					"response": []
+				},
+				{
+					"name": "Chart Conversion Rates",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/charts/conversion-rates?months=6",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"charts",
+								"conversion-rates"
+							],
+							"query": [
+								{
+									"key": "months",
+									"value": "6",
+									"description": "Number of past months"
+								}
+							]
+						},
+						"description": "Admin access required. Get monthly conversion rates (accepted requests / total requests)."
+					},
+					"response": []
+				},
+				{
+					"name": "Chart Dashboard Summary",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/charts/dashboard-summary",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"charts",
+								"dashboard-summary"
+							]
+						},
+						"description": "Admin access required. Get combined summary data suitable for multiple dashboard charts."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Negotiation History",
+			"item": [
+				{
+					"name": "Get Negotiation History for Ad Request",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/ad_requests/:ad_request_id/history",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"ad_requests",
+								":ad_request_id",
+								"history"
+							],
+							"variable": [
+								{
+									"key": "ad_request_id",
+									"value": "1",
+									"description": "ID of the Ad Request"
+								}
+							]
+						},
+						"description": "Get the full negotiation history for a specific Ad Request. Accessible by the involved Sponsor, Influencer, or an Admin."
+					},
+					"response": []
+				},
+				{
+					"name": "Sponsor Campaign Negotiation Summary",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/sponsor/campaigns/:campaign_id/negotiation_summary",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"sponsor",
+								"campaigns",
+								":campaign_id",
+								"negotiation_summary"
+							],
+							"variable": [
+								{
+									"key": "campaign_id",
+									"value": "1",
+									"description": "ID of the Sponsor's campaign"
+								}
+							]
+						},
+						"description": "Sponsor access required. Get a summary (latest action) for all negotiations within a specific campaign."
+					},
+					"response": []
+				},
+				{
+					"name": "Influencer My Negotiations Summary",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/influencer/negotiations",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"influencer",
+								"negotiations"
+							]
+						},
+						"description": "Influencer access required. Get a summary (latest action) for all negotiations the influencer is involved in."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Health Check",
+			"item": [
+				{
+					"name": "Health Check",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/health",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"health"
+							]
+						},
+						"description": "Simple health check endpoint."
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://127.0.0.1:5000/api",
+			"type": "string"
+		},
+		{
+			"key": "jwt_token",
+			"value": "",
+			"type": "string",
+			"description": "Store JWT token obtained from login here"
+		}
+	]
+}
+
