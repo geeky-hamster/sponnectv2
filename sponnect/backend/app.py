@@ -140,16 +140,33 @@ def serialize_negotiation_history(history_item):
 @app.cli.command("create-admin")
 def create_admin_command():
     """Creates the admin user from .env variables."""
-    admin_username = Config.ADMIN_USERNAME
+    admin_email = Config.ADMIN_EMAIL
     admin_password = Config.ADMIN_PASSWORD
-    if not admin_username or not admin_password: print("Error: ADMIN_USERNAME/PASSWORD missing in .env"); return
-    if User.query.filter_by(username=admin_username, role='admin').first(): print(f"Admin '{admin_username}' exists."); return
+    if not admin_email or not admin_password:
+        print("Error: ADMIN_EMAIL and ADMIN_PASSWORD missing in .env")
+        return
 
-    admin_user = User(username=admin_username, role='admin', is_active=True, sponsor_approved=True)
-    admin_user.set_password(admin_password)
-    db.session.add(admin_user)
-    db.session.commit()
-    print(f"Admin user '{admin_username}' created.")
+    with app.app_context():  # Important: establish app context
+        if User.query.filter_by(email=admin_email, role='admin').first():
+            print(f"Admin '{admin_email}' already exists.")
+            return
+
+        admin_user = User(
+            username=Config.ADMIN_USERNAME,  # Use ADMIN_USERNAME from config
+            email=Config.ADMIN_EMAIL,
+            role='admin',
+            is_active=True,
+            sponsor_approved=True
+        )
+        admin_user.set_password(admin_password)
+        db.session.add(admin_user)
+        try:
+            db.session.commit()
+            print(f"Admin user '{admin_email}' created.")
+        except Exception as e:  # Handle potential database errors
+            print(f"Error creating admin user: {e}")
+            db.session.rollback()  # Rollback changes in case of error
+
 
 # --- Routes ---
 
@@ -158,23 +175,33 @@ def create_admin_command():
 def register():
     data = request.get_json()
     username = data.get('username')
+    email = data.get('email')
     password = data.get('password')
-    role = data.get('role', 'influencer') # Defaults to influencer
+    role = data.get('role', 'influencer')  # Defaults to influencer
 
-    if not username or not password: return jsonify({"message": "Username and password required"}), 400
-    if User.query.filter_by(username=username).first(): return jsonify({"message": "Username already exists"}), 409
-    if role not in ['influencer', 'sponsor']: return jsonify({"message": "Invalid role"}), 400
+    if not username or not password or not email:  # Require email now
+        return jsonify({"message": "Username, email, and password are required"}), 400
 
-    user = User(username=username, role=role)
-    user.set_password(password)
+    if User.query.filter_by(username=username).first():
+        return jsonify({"message": "Username already exists"}), 409
+
+    if User.query.filter_by(email=email).first():  # Check for existing email
+        return jsonify({"message": "Email already exists"}), 409
+
+
+    if role not in ['influencer', 'sponsor']:
+        return jsonify({"message": "Invalid role"}), 400
+
+    user = User(username=username, email=email, role=role)  # Store email!
+    user.set_password(password)  # Ensure proper password hashing (see previous responses)
     message = ""
 
     if role == 'sponsor':
         user.company_name = data.get('company_name')
         user.industry = data.get('industry')
-        user.sponsor_approved = False # Requires approval
+        user.sponsor_approved = False  # Requires approval
         message = "Sponsor registered. Account requires admin approval."
-    else: # influencer
+    else:  # influencer
         user.influencer_name = data.get('influencer_name')
         user.category = data.get('category')
         user.niche = data.get('niche')
@@ -183,22 +210,41 @@ def register():
 
     db.session.add(user)
     db.session.commit()
-    return jsonify({"message": message}), 201
+    return jsonify({"message": message, "user_id": user.id}), 201  # Return user ID
 
 @app.route('/api/login', methods=['POST'])
 def login():
     data = request.get_json()
     username = data.get('username')
+    email = data.get('email')  # Get email separately
     password = data.get('password')
-    user = User.query.filter_by(username=username).first()
 
-    if not user or not user.check_password(password): return jsonify({"message": "Invalid credentials"}), 401
-    if not user.is_active: return jsonify({"message": "Account deactivated"}), 403
+    if not password:
+        return jsonify({"message": "Password is required"}), 400
+
+    if username:
+        user = User.query.filter_by(username=username).first()
+    elif email:
+        user = User.query.filter_by(email=email).first()
+    else:
+        return jsonify({"message": "Username or email is required"}), 400 # More specific
+
+
+
+    if not user or not user.check_password(password):
+        return jsonify({"message": "Invalid credentials"}), 401
+
+    # ... (rest of the login logic remains the same)
+    if not user.is_active:
+        return jsonify({"message": "Account deactivated"}), 403
     # Check sponsor approval status only if user is a sponsor
-    if user.role == 'sponsor' and not user.sponsor_approved: return jsonify({"message": "Sponsor account pending approval"}), 403
+    if user.role == 'sponsor' and not user.sponsor_approved:
+        return jsonify({"message": "Sponsor account pending approval"}), 403
 
     access_token = create_access_token(identity=user.id, additional_claims={'role': user.role})
     return jsonify(access_token=access_token, user_role=user.role), 200
+
+
 
 # == Profile Management ==
 @app.route('/api/profile', methods=['GET'])

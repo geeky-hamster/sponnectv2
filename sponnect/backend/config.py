@@ -17,5 +17,6 @@ class Config:
     JWT_ACCESS_TOKEN_EXPIRES = timedelta(hours=int(os.environ.get('JWT_ACCESS_TOKEN_EXPIRES_HOURS', 1)))
 
     ADMIN_USERNAME = os.environ.get('ADMIN_USERNAME', 'admin')
+    ADMIN_EMAIL = os.environ.get('ADMIN_EMAIL', 'admin@sponnect.com')
     ADMIN_PASSWORD = os.environ.get('ADMIN_PASSWORD', 'password')
     DEBUG = os.environ.get('FLASK_DEBUG') == '1'
