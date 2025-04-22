@@ -15,7 +15,7 @@
             <div 
               class="account-type-option" 
               :class="{ active: accountType === 'brand' }"
-              @click="accountType = 'brand'"
+              @click="accountType = 'sponsor'"
             >
               <i class="fas fa-briefcase"></i>
               <span>Brand</span>
@@ -242,14 +242,14 @@ export default {
       
       try {
         await store.dispatch('auth/register', {
-          name: name.value,
+          username: name.value,
           email: email.value,
           password: password.value,
-          accountType: accountType.value,
+          role: accountType.value,
         })
         
         // If successful, redirect to onboarding
-        router.push(`/onboarding/${accountType.value}`)
+        router.push(`/auth/login?redirect=/`)
       } catch (err) {
         error.value = err.response?.data?.message || 'Registration failed. Please try again.'
       } finally {

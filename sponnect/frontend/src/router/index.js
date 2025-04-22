@@ -5,6 +5,7 @@ import store from '../store';
 // Layouts
 import MainLayout from '../layouts/MainLayout.vue';
 import AuthLayout from '../layouts/AuthLayout.vue';
+import LandingPage from "@/views/LandingPage.vue";
 
 // Auth Views
 import Login from '../views/auth/Login.vue';
@@ -39,8 +40,15 @@ import CampaignDetail from '../views/CampaignDetail.vue';
 import NotFound from '../views/NotFound.vue';
 
 const routes = [
+  // Landing page
+  { path: "/",
+    name: "LandingPage", 
+    component: LandingPage,
+    meta: { title: "Welcome to Sponnect" },
+  },
+
   {
-    path: '/',
+    path: '/app',
     component: MainLayout,
     meta: { requiresAuth: true },
     children: [
@@ -51,6 +59,9 @@ const routes = [
         component: Dashboard,
         meta: { title: 'Dashboard' }
       },
+
+      
+      
       // Profile
       {
         path: 'profile',
@@ -212,6 +223,12 @@ router.beforeEach((to, from, next) => {
   
   const isLoggedIn = store.getters['auth/isAuthenticated'];
   
+  // Allow access to LandingPage without authentication
+  if (to.name === 'LandingPage') {
+    next();
+    return;
+  }
+
   // Handle auth required routes
   if (to.matched.some(record => record.meta.requiresAuth)) {
     if (!isLoggedIn) {
@@ -231,7 +248,13 @@ router.beforeEach((to, from, next) => {
         (requiredRole === 'influencer' && store.getters['auth/isInfluencer']);
       
       if (!hasRole) {
-        next({ name: 'Dashboard' });
+        const userRole = store.getters['auth/userRole'];
+        const fallbackPath = 
+          userRole === 'admin' ? '/app/admin' : 
+          userRole === 'brand' ? '/app/brand/dashboard' : 
+          userRole === 'influencer' ? '/app/influencer/dashboard' : 
+          '/notfound';
+        next(fallbackPath);
         return;
       }
     }

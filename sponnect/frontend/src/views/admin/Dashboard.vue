@@ -25,12 +25,12 @@
         <h2 class="text-xl font-bold mb-4">User Growth</h2>
         <div class="h-64">
           <LineChart
-            v-if="chartData.userGrowth.length" 
+            v-if="chartData.userGrowth && chartData.userGrowth.labels && chartData.userGrowth.labels.length"
             :chart-data="prepareUserGrowthChart"
             :options="lineChartOptions"
           />
           <div v-else class="h-full flex items-center justify-center text-gray-400">
-            Loading chart data...
+            No user growth data available.
           </div>
         </div>
       </div>
@@ -39,12 +39,12 @@
         <h2 class="text-xl font-bold mb-4">Campaign Activity</h2>
         <div class="h-64">
           <BarChart
-            v-if="chartData.campaignActivity.length"
+            v-if="chartData.campaignActivity && chartData.campaignActivity.labels && chartData.campaignActivity.labels.length"
             :chart-data="prepareCampaignActivityChart"
             :options="barChartOptions"
           />
           <div v-else class="h-full flex items-center justify-center text-gray-400">
-            Loading chart data...
+            No campaign activity data available.
           </div>
         </div>
       </div>
@@ -151,6 +151,7 @@ export default {
     BarChart
   },
   setup() {
+    console.log('AdminDashboard component loaded');
     const store = useStore();
     const router = useRouter();
     const toast = useToast();
@@ -160,11 +161,15 @@ export default {
     // Fetch data on component mount
     onMounted(async () => {
       try {
+        console.log('Fetching admin stats...');
         await store.dispatch('admin/fetchStats');
+        console.log('Fetching pending sponsors...');
         await store.dispatch('admin/fetchPendingSponsors');
         loadingPendingSponsors.value = false;
-        await store.dispatch('admin/fetchUserGrowthData');
-        await store.dispatch('admin/fetchCampaignActivityData');
+        console.log('Fetching user growth data...');
+        await store.dispatch('admin/fetchUserGrowthChart');
+        console.log('Fetching campaign activity data...');
+        await store.dispatch('admin/fetchCampaignActivityChart');
       } catch (error) {
         toast.error('Failed to load dashboard data');
         console.error('Dashboard data loading error:', error);
@@ -174,26 +179,27 @@ export default {
     // Computed properties for accessing store data
     const stats = computed(() => {
       const statsData = store.getters['admin/stats'];
+      console.log('Stats Data:', statsData); 
       return {
         users: {
           label: 'Total Users',
-          value: statsData.totalUsers || 0,
-          change: statsData.userGrowthRate || 0
+          value: statsData.total_users || 0,
+          change: 0
         },
         sponsors: {
-          label: 'Approved Sponsors',
-          value: statsData.approvedSponsors || 0,
-          change: statsData.sponsorGrowthRate || 0
+          label: 'Active Sponsors',
+          value: statsData.active_sponsors || 0, // Updated to match API response
+          change: 0 // Placeholder since `sponsorGrowthRate` is not provided in the API response
         },
         campaigns: {
-          label: 'Active Campaigns',
-          value: statsData.activeCampaigns || 0,
-          change: statsData.campaignGrowthRate || 0
+          label: 'Public Campaigns',
+          value: statsData.public_campaigns || 0, // Updated to match API response
+          change: 0 // Placeholder since `campaignGrowthRate` is not provided in the API response
         },
         adRequests: {
-          label: 'Monthly Ad Requests',
-          value: statsData.monthlyAdRequests || 0,
-          change: statsData.adRequestGrowthRate || 0
+          label: 'Ad Requests',
+          value: Object.values(statsData.ad_requests_by_status || {}).reduce((sum, count) => sum + count, 0), // Sum of all ad request statuses
+          change: 0 // Placeholder since `adRequestGrowthRate` is not provided in the API response
         }
       };
     });
@@ -204,6 +210,7 @@ export default {
       userGrowth: store.getters['admin/chartData'].userGrowth || [],
       campaignActivity: store.getters['admin/chartData'].campaignActivity || []
     }));
+    console.log('Chart Data:', chartData.value);
     
     // Chart configurations
     const lineChartOptions = {

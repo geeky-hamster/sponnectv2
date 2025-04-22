@@ -16,6 +16,7 @@ const state = {
 
 const mutations = {
   SET_STATS(state, stats) {
+    console.log('Committing stats to state:', stats);
     state.stats = stats;
   },
   SET_PENDING_SPONSORS(state, sponsors) {
@@ -32,6 +33,7 @@ const actions = {
     dispatch('ui/setLoading', true, { root: true });
     try {
       const response = await axios.get('/admin/stats');
+      console.log('Stats API Response:', response.data);
       commit('SET_STATS', response.data);
       dispatch('ui/setLoading', false, { root: true });
       return response.data;
@@ -47,6 +49,7 @@ const actions = {
     dispatch('ui/setLoading', true, { root: true });
     try {
       const response = await axios.get('/admin/pending_sponsors');
+      console.log('Dashboard API Response:', response.data);
       commit('SET_PENDING_SPONSORS', response.data);
       dispatch('ui/setLoading', false, { root: true });
       return response.data;
@@ -242,9 +245,18 @@ const actions = {
 };
 
 const getters = {
-  adminStats: state => state.stats,
-  pendingSponsors: state => state.pendingSponsors,
-  chartData: state => state.chartData
+  adminStats: state => {
+    console.log('Stats:', state.stats);
+    return state.stats || {};
+  },
+  pendingSponsors: state => {
+    console.log('Pending Sponsors:', state.pendingSponsors);
+    return state.pendingSponsors || [];
+  },
+  chartData: state => {
+    console.log('Chart Data:', state.chartData);
+    return state.chartData || { userGrowth: [], campaignActivity: [] };
+  },
 };
 
 export default {

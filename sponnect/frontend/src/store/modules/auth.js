@@ -64,7 +64,8 @@ const actions = {
       toast.success('Login successful!');
       dispatch('ui/setLoading', false, { root: true });
       return true;
-    } catch (error) {
+    } 
+    catch (error) {
       commit('AUTH_ERROR');
       localStorage.removeItem('token');
       delete axios.defaults.headers.common['Authorization'];
@@ -79,6 +80,7 @@ const actions = {
     dispatch('ui/setLoading', true, { root: true });
     try {
       const response = await axios.get('/profile');
+      console.log('Profile Response:', response.data);
       commit('SET_USER', response.data);
       dispatch('ui/setLoading', false, { root: true });
       return response.data;
@@ -122,6 +124,7 @@ const actions = {
 
 // Getters
 const getters = {
+  userRole: state => state.currentUser?.role || null,
   isAuthenticated: state => !!state.token,
   currentUser: state => state.currentUser,
   authStatus: state => state.status,

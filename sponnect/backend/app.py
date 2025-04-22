@@ -18,7 +18,7 @@ from models import db, User, Campaign, AdRequest
 
 # --- App Initialization ---
 app = Flask(__name__)
-CORS(app, resources={r"*": {"origins": "http://localhost:5174"}})
+CORS(app, resources={r"*": {"origins": "http://localhost:5173"}})
 app.config.from_object(Config)
 
 # --- Extension Initialization ---

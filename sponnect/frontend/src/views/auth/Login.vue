@@ -13,8 +13,7 @@
           <label for="email">Email Address</label>
           <input 
             id="email" 
-            v-model="email" 
-            type="email" 
+            v-model="username" 
             placeholder="Enter your email address"
             required
           />
@@ -62,22 +61,6 @@
         </button>
       </form>
       
-      <div class="alternative-login">
-        <div class="divider">
-          <span>Or continue with</span>
-        </div>
-        
-        <div class="social-login-buttons">
-          <button @click="socialLogin('google')" class="social-button google">
-            <i class="fab fa-google"></i>
-            <span>Google</span>
-          </button>
-          <button @click="socialLogin('facebook')" class="social-button facebook">
-            <i class="fab fa-facebook-f"></i>
-            <span>Facebook</span>
-          </button>
-        </div>
-      </div>
       
       <div class="alternative-options">
         <p>
@@ -89,7 +72,7 @@
     <div class="login-info">
       <div class="info-content">
         <div class="logo-container">
-          <img src="@/assets/vue.svg" alt="Sponnect Logo" class="logo" />
+          <img src="@/assets/logo.png" alt="Sponnect Logo" class="logo" />
           <h2>Sponnect</h2>
         </div>
         
@@ -139,7 +122,7 @@ export default {
     const route = useRoute()
     
     // Form data
-    const email = ref('')
+    const username = ref('')
     const password = ref('')
     const rememberMe = ref(false)
     
@@ -155,22 +138,27 @@ export default {
     
     // Login function
     const login = async () => {
-      if (!email.value || !password.value) return
+      if (!username.value || !password.value) return
       
       isSubmitting.value = true
       error.value = ''
       
       try {
         await store.dispatch('auth/login', {
-          email: email.value,
+          username: username.value,
           password: password.value,
           remember: rememberMe.value
         })
         
         // Get redirect path or default based on user role
-        const redirectPath = route.query.redirect || 
-          (store.getters['auth/userRole'] === 'brand' ? '/brand/dashboard' : '/influencer/dashboard')
+        const userRole = store.getters['auth/userRole'];
+        console.log('User Role:', userRole);
+        const redirectPath = 
+          userRole === 'admin' ? '/app/admin' : 
+          userRole === 'brand' ? '/app/brand/dashboard' : 
+          userRole === 'influencer' ? '/app/influencer/dashboard' : '/';
         
+        console.log('Redirect Path:', redirectPath); // Debugging
         router.push(redirectPath)
       } catch (err) {
         error.value = err.response?.data?.message || 'Login failed. Please check your credentials and try again.'
@@ -190,7 +178,7 @@ export default {
     }
     
     return {
-      email,
+      username,
       password,
       rememberMe,
       showPassword,
@@ -204,10 +192,10 @@ export default {
 </script>
 
 <style scoped>
+
 .login-container {
   display: flex;
   min-height: 100vh;
-  background-color: #f8fafc;
 }
 
 .login-form-container {
@@ -222,13 +210,13 @@ export default {
 .form-title {
   font-size: 2rem;
   font-weight: 700;
-  color: #1e293b;
+  color: #01122e;
   margin-bottom: 0.5rem;
 }
 
 .form-subtitle {
   font-size: 1rem;
-  color: #64748b;
+  color: #001532;
   margin-bottom: 2rem;
 }
 
@@ -256,7 +244,7 @@ export default {
 .form-group label {
   font-size: 0.875rem;
   font-weight: 500;
-  color: #1e293b;
+  color: #001536;
 }
 
 .form-group input[type="text"],
@@ -362,7 +350,7 @@ export default {
 
 .divider span {
   padding: 0 1rem;
-  color: #64748b;
+  color: #001532;
   font-size: 0.875rem;
 }
 
@@ -409,7 +397,7 @@ export default {
   margin-top: 2rem;
   text-align: center;
   font-size: 0.9rem;
-  color: #64748b;
+  color: #001533;
 }
 
 .alternative-options a {
@@ -422,7 +410,8 @@ export default {
 .login-info {
   display: flex;
   flex: 1;
-  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  background-image: url(https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExZnp2aHoxY3NrdjFuaGJ5Yzc4ZDFwZm85amVidDJiZHFtczM4ODF3diZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/PXApia9fVviiWREDRq/giphy.gif) !important;
+  background-size: 472px;
   align-items: center;
   justify-content: center;
   color: white;
