@@ -237,7 +237,6 @@ router.beforeEach((to, from, next) => {
     }
     
     // Check role requirements
-    const currentUser = store.getters['auth/currentUser'];
     if (to.matched.some(record => record.meta.requiresRole)) {
       const requiredRole = to.matched.find(record => record.meta.requiresRole).meta.requiresRole;
       
@@ -246,14 +245,17 @@ router.beforeEach((to, from, next) => {
         (requiredRole === 'admin' && store.getters['auth/isAdmin']) ||
         (requiredRole === 'sponsor' && store.getters['auth/isSponsor']) ||
         (requiredRole === 'influencer' && store.getters['auth/isInfluencer']);
+        console.log('Navigating to:', to.name);
+        console.log('User Role:', store.getters['auth/userRole']);
+        console.log('Has Role:', hasRole);
       
       if (!hasRole) {
         const userRole = store.getters['auth/userRole'];
         const fallbackPath = 
           userRole === 'admin' ? '/app/admin' : 
-          userRole === 'brand' ? '/app/brand/dashboard' : 
+          userRole === 'sponsor' ? '/app/sponsor/dashboard' : 
           userRole === 'influencer' ? '/app/influencer/dashboard' : 
-          '/notfound';
+          '/';
         next(fallbackPath);
         return;
       }

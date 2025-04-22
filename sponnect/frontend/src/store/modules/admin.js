@@ -15,9 +15,8 @@ const state = {
 };
 
 const mutations = {
-  SET_STATS(state, stats) {
-    console.log('Committing stats to state:', stats);
-    state.stats = stats;
+  SET_STATS(state, res_stats) {
+    state.stats = res_stats;
   },
   SET_PENDING_SPONSORS(state, sponsors) {
     state.pendingSponsors = sponsors;
@@ -28,16 +27,16 @@ const mutations = {
 };
 
 const actions = {
-  async fetchAdminStats({ commit, dispatch }) {
+  async fetchAdminStats({ commit }) {
     const toast = useToast();
     dispatch('ui/setLoading', true, { root: true });
     try {
-      const response = await axios.get('/admin/stats');
-      console.log('Stats API Response:', response.data);
-      commit('SET_STATS', response.data);
+      const resp = await axios.get('/api/admin/stats').then(resp => {
+      commit('SET_STATS', resp.data)});
       dispatch('ui/setLoading', false, { root: true });
-      return response.data;
+      return resp.data;
     } catch (error) {
+      console.error('Error in fetchAdminStats:', error); // Log the error
       toast.error(error.response?.data?.message || 'Failed to load admin statistics.');
       dispatch('ui/setLoading', false, { root: true });
       return null;
@@ -48,7 +47,7 @@ const actions = {
     const toast = useToast();
     dispatch('ui/setLoading', true, { root: true });
     try {
-      const response = await axios.get('/admin/pending_sponsors');
+      const response = await axios.get('/api/admin/pending_sponsors');
       console.log('Dashboard API Response:', response.data);
       commit('SET_PENDING_SPONSORS', response.data);
       dispatch('ui/setLoading', false, { root: true });
@@ -64,7 +63,7 @@ const actions = {
     const toast = useToast();
     dispatch('ui/setLoading', true, { root: true });
     try {
-      const response = await axios.patch(`/admin/sponsors/${sponsorId}/approve`);
+      const response = await axios.patch(`/api/admin/sponsors/${sponsorId}/approve`);
       await dispatch('fetchPendingSponsors'); // Refresh list
       toast.success('Sponsor approved successfully!');
       dispatch('ui/setLoading', false, { root: true });
@@ -80,7 +79,7 @@ const actions = {
     const toast = useToast();
     dispatch('ui/setLoading', true, { root: true });
     try {
-      const response = await axios.patch(`/admin/sponsors/${sponsorId}/reject`);
+      const response = await axios.patch(`/api/admin/sponsors/${sponsorId}/reject`);
       await dispatch('fetchPendingSponsors'); // Refresh list
       toast.success('Sponsor rejected successfully!');
       dispatch('ui/setLoading', false, { root: true });
@@ -96,7 +95,7 @@ const actions = {
     const toast = useToast();
     dispatch('ui/setLoading', true, { root: true });
     try {
-      await axios.patch(`/admin/users/${userId}/flag`);
+      await axios.patch(`/api/admin/users/${userId}/flag`);
       toast.success('User flagged successfully!');
       dispatch('ui/setLoading', false, { root: true });
       return true;
@@ -111,7 +110,7 @@ const actions = {
     const toast = useToast();
     dispatch('ui/setLoading', true, { root: true });
     try {
-      await axios.patch(`/admin/users/${userId}/unflag`);
+      await axios.patch(`/api/admin/users/${userId}/unflag`);
       toast.success('User unflagged successfully!');
       dispatch('ui/setLoading', false, { root: true });
       return true;
@@ -126,7 +125,7 @@ const actions = {
     const toast = useToast();
     dispatch('ui/setLoading', true, { root: true });
     try {
-      await axios.patch(`/admin/campaigns/${campaignId}/flag`);
+      await axios.patch(`/api/admin/campaigns/${campaignId}/flag`);
       toast.success('Campaign flagged successfully!');
       dispatch('ui/setLoading', false, { root: true });
       return true;
@@ -141,7 +140,7 @@ const actions = {
     const toast = useToast();
     dispatch('ui/setLoading', true, { root: true });
     try {
-      await axios.patch(`/admin/campaigns/${campaignId}/unflag`);
+      await axios.patch(`/api/admin/campaigns/${campaignId}/unflag`);
       toast.success('Campaign unflagged successfully!');
       dispatch('ui/setLoading', false, { root: true });
       return true;
@@ -157,7 +156,7 @@ const actions = {
     const toast = useToast();
     dispatch('ui/setLoading', true, { root: true });
     try {
-      const response = await axios.get('/charts/user-growth');
+      const response = await axios.get('/api/charts/user-growth');
       commit('SET_CHART_DATA', { chartType: 'userGrowth', data: response.data });
       dispatch('ui/setLoading', false, { root: true });
       return response.data;
@@ -172,7 +171,7 @@ const actions = {
     const toast = useToast();
     dispatch('ui/setLoading', true, { root: true });
     try {
-      const response = await axios.get('/charts/campaign-distribution');
+      const response = await axios.get('/api/charts/campaign-distribution');
       commit('SET_CHART_DATA', { chartType: 'campaignDistribution', data: response.data });
       dispatch('ui/setLoading', false, { root: true });
       return response.data;
@@ -187,7 +186,7 @@ const actions = {
     const toast = useToast();
     dispatch('ui/setLoading', true, { root: true });
     try {
-      const response = await axios.get('/charts/ad-request-status');
+      const response = await axios.get('/api/charts/ad-request-status');
       commit('SET_CHART_DATA', { chartType: 'adRequestStatus', data: response.data });
       dispatch('ui/setLoading', false, { root: true });
       return response.data;
@@ -202,7 +201,7 @@ const actions = {
     const toast = useToast();
     dispatch('ui/setLoading', true, { root: true });
     try {
-      const response = await axios.get('/charts/campaign-activity');
+      const response = await axios.get('/api/charts/campaign-activity');
       commit('SET_CHART_DATA', { chartType: 'campaignActivity', data: response.data });
       dispatch('ui/setLoading', false, { root: true });
       return response.data;
@@ -217,7 +216,7 @@ const actions = {
     const toast = useToast();
     dispatch('ui/setLoading', true, { root: true });
     try {
-      const response = await axios.get('/charts/conversion-rates');
+      const response = await axios.get('/api/charts/conversion-rates');
       commit('SET_CHART_DATA', { chartType: 'conversionRates', data: response.data });
       dispatch('ui/setLoading', false, { root: true });
       return response.data;
@@ -232,7 +231,7 @@ const actions = {
     const toast = useToast();
     dispatch('ui/setLoading', true, { root: true });
     try {
-      const response = await axios.get('/charts/dashboard-summary');
+      const response = await axios.get('/api/charts/dashboard-summary');
       commit('SET_CHART_DATA', { chartType: 'dashboardSummary', data: response.data });
       dispatch('ui/setLoading', false, { root: true });
       return response.data;
@@ -246,7 +245,7 @@ const actions = {
 
 const getters = {
   adminStats: state => {
-    console.log('Stats:', state.stats);
+    console.log('Stats Getter:', state.stats);
     return state.stats || {};
   },
   pendingSponsors: state => {

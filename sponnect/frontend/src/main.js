@@ -14,7 +14,8 @@ import Toast, { POSITION } from 'vue-toastification'
 import "vue-toastification/dist/index.css" // Default CSS
 
 // Configure Axios (baseURL, interceptors)
-axios.defaults.baseURL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api'
+axios.defaults.baseURL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
+axios.defaults.headers.common['Authorization'] = `Bearer ${store.getters['auth/token']}`;
 
 axios.interceptors.request.use(config => {
   const token = store.state.auth.token

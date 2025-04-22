@@ -41,6 +41,39 @@
             required
           />
         </div>
+
+        <!-- Sponsor-Specific Fields -->
+        <div v-if="accountType === 'sponsor'">
+          <div class="form-group">
+            <label for="company-name">Company Name</label>
+            <input 
+              id="company-name" 
+              v-model="companyName" 
+              type="text" 
+              placeholder="Enter your company name"
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="industry">Industry</label>
+            <select 
+              id="industry" 
+              v-model="industry" 
+              required
+            >
+              <option value="" disabled>Select your industry</option>
+              <option value="technology">Technology</option>
+              <option value="fashion">Fashion</option>
+              <option value="food">Food & Beverage</option>
+              <option value="health">Health & Wellness</option>
+              <option value="entertainment">Entertainment</option>
+              <option value="education">Education</option>
+              <option value="finance">Finance</option>
+              <option value="travel">Travel & Tourism</option>
+            </select>
+          </div>
+        </div>
         
         <div class="form-group">
           <label for="email">Email Address</label>
@@ -180,6 +213,8 @@ export default {
     const password = ref('')
     const confirmPassword = ref('')
     const termsAccepted = ref(false)
+    const companyName = ref(''); // Sponsor-specific field
+    const industry = ref(''); // Sponsor-specific field
     
     // UI state
     const showPassword = ref(false)
@@ -221,12 +256,17 @@ export default {
     })
     
     const formValid = computed(() => {
-      return name.value.trim() !== '' &&
+      const isCommonValid = name.value.trim() !== '' &&
         email.value.trim() !== '' &&
         password.value.length >= 8 &&
-        passwordsMatch.value &&
-        termsAccepted.value
-    })
+        termsAccepted.value;
+
+      if (accountType.value === 'sponsor') {
+        return isCommonValid && companyName.value.trim() !== '' && industry.value.trim() !== '';
+      }
+
+      return isCommonValid;
+    });
     
     // Reset error message when form values change
     watch([name, email, password, confirmPassword], () => {
@@ -241,12 +281,19 @@ export default {
       error.value = ''
       
       try {
-        await store.dispatch('auth/register', {
+        const payload = {
           username: name.value,
           email: email.value,
           password: password.value,
           role: accountType.value,
-        })
+        };
+
+        if (accountType.value === 'sponsor') {
+          payload.company_name = companyName.value;
+          payload.industry = industry.value;
+        }
+
+        await store.dispatch('auth/register', payload);
         
         // If successful, redirect to onboarding
         router.push(`/auth/login?redirect=/`)
@@ -272,7 +319,9 @@ export default {
       passwordStrengthText,
       passwordsMatch,
       formValid,
-      register
+      register,
+      companyName,
+      industry
     }
   }
 }
@@ -529,7 +578,8 @@ export default {
 .register-info {
   display: flex;
   flex: 1;
-  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  background-image: url(https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExZnp2aHoxY3NrdjFuaGJ5Yzc4ZDFwZm85amVidDJiZHFtczM4ODF3diZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/PXApia9fVviiWREDRq/giphy.gif) !important;
+  background-size: 580px;
   align-items: center;
   justify-content: center;
   color: white;

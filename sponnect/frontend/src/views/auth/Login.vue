@@ -10,11 +10,11 @@
       
       <form @submit.prevent="login" class="login-form">
         <div class="form-group">
-          <label for="email">Email Address</label>
+          <label for="email">Username or Email Address</label>
           <input 
             id="email" 
             v-model="username" 
-            placeholder="Enter your email address"
+            placeholder="Enter your email address or username"
             required
           />
         </div>
@@ -152,13 +152,11 @@ export default {
         
         // Get redirect path or default based on user role
         const userRole = store.getters['auth/userRole'];
-        console.log('User Role:', userRole);
         const redirectPath = 
           userRole === 'admin' ? '/app/admin' : 
-          userRole === 'brand' ? '/app/brand/dashboard' : 
+          userRole === 'sponsor' ? '/app/sponsor/dashboard' : 
           userRole === 'influencer' ? '/app/influencer/dashboard' : '/';
         
-        console.log('Redirect Path:', redirectPath); // Debugging
         router.push(redirectPath)
       } catch (err) {
         error.value = err.response?.data?.message || 'Login failed. Please check your credentials and try again.'

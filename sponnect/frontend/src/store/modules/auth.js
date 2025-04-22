@@ -80,7 +80,6 @@ const actions = {
     dispatch('ui/setLoading', true, { root: true });
     try {
       const response = await axios.get('/profile');
-      console.log('Profile Response:', response.data);
       commit('SET_USER', response.data);
       dispatch('ui/setLoading', false, { root: true });
       return response.data;

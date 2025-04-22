@@ -162,7 +162,7 @@ export default {
     onMounted(async () => {
       try {
         console.log('Fetching admin stats...');
-        await store.dispatch('admin/fetchStats');
+        await store.dispatch('admin/fetchAdminStats');
         console.log('Fetching pending sponsors...');
         await store.dispatch('admin/fetchPendingSponsors');
         loadingPendingSponsors.value = false;
@@ -178,8 +178,7 @@ export default {
     
     // Computed properties for accessing store data
     const stats = computed(() => {
-      const statsData = store.getters['admin/stats'];
-      console.log('Stats Data:', statsData); 
+      const statsData = store.getters['admin/adminStats'];
       return {
         users: {
           label: 'Total Users',
@@ -311,6 +310,7 @@ export default {
     
     return {
       stats,
+      router,
       pendingSponsors,
       chartData,
       lineChartOptions,
